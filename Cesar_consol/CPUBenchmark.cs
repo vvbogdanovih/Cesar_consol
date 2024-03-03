@@ -18,10 +18,10 @@ namespace Cesar_consol
         /// <param name="matrix"></param>
         /// <param name="startSize"></param>
         /// <param name="endSize"></param>
-        public List<SimpleResult> RunSumTest(Matrix matrix, int startSize, int step)
+        public List<SimpleResult> RunSumTest(float[,] matrix, int startSize, int step)
         {
             List<SimpleResult> Results = new List<SimpleResult>();            
-            int endSize = matrix.Size / step;
+            int endSize = matrix.GetLength(0) / step;
             stopWatch.Restart();
 
             // Performs a series of tests from "startSize" to "endSize"
@@ -36,7 +36,7 @@ namespace Cesar_consol
                 {
                     for (int j = 0; j < size; j++)
                     {
-                        sum += matrix.matrix[i, j];
+                        sum += matrix[i, j];
                     }
                     sumArray[i] = sum;
                     sum = 0;
@@ -57,10 +57,10 @@ namespace Cesar_consol
         /// <param name="matrixB"></param>
         /// <param name="startSize"></param>
         /// <param name="endSize"></param>
-        public List<SimpleResult> RunMultTest(Matrix matrixA, Matrix matrixB, int startSize, int step)
+        public List<SimpleResult> RunMultTest(float[,] matrixA, float[,] matrixB, int startSize, int step)
         {
             List<SimpleResult> Results = new List<SimpleResult>();
-            int endSize = matrixA.Size / step;
+            int endSize = matrixA.GetLength(0) / step;
             stopWatch.Restart();
 
             // Performs a series of tests from "startSize" to "endSize"

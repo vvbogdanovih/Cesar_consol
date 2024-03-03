@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using ILGPU.Runtime;
+using ILGPU;
+using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 
@@ -6,7 +8,7 @@ namespace Cesar_consol
 {
     internal class Program
     {
-        public const int N = 10;
+        
         public static void PrintMatrix(float[,] matrix)
         {
             for (int i = 0; i < matrix.GetLength(0); i++)
@@ -31,7 +33,18 @@ namespace Cesar_consol
         }
         public static void Main()
         {
+            var matrixA = new float[3, 3] {
+            {1,2,3 },{2,3,4 },{3,4,5 } };
+            var matrixB = new float[3, 3] {
+            {2,3,4 },{2,3,4 },{3,4,5 } };
 
+            var s = Stopwatch.StartNew();
+
+            
         }
+
+        
+        
+
     }
 }

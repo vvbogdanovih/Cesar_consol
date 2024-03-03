@@ -92,6 +92,7 @@ namespace Cesar_consol
             return b;
         }
 
+        public float[,] ToFloat() => matrix;
 
     }
 }
