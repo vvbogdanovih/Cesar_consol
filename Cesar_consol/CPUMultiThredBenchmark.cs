@@ -62,15 +62,15 @@ namespace Cesar_consol
 
         public List<SimpleResult> RunMultTestAsync(Matrix matrixA, Matrix matrixB, int startSize, int step)
         {
-            static void MultAsync(Matrix matrixA, Matrix matrixB, Matrix matrixC)
+            static void MultAsync(Matrix matrixA, Matrix matrixB, Matrix matrixResult)
             {
-                static void Mult(Matrix matrixA, Matrix matrixB, Matrix matrixC, int i)
+                static void Mult(Matrix matrixA, Matrix matrixB, Matrix matrixResult, int i)
                 {
                     for (int j = 0; j < matrixB.Size; j++)
                     {
                         for (int k = 0; k < matrixA.Size; k++)
                         {
-                            matrixC[i, j] += matrixA[i, k] * matrixB[k, j];
+                            matrixResult[i, j] += matrixA[i, k] * matrixB[k, j];
                         }
                     }
                 }
@@ -79,7 +79,7 @@ namespace Cesar_consol
                 for (int i = 0; i < matrixA.Size; i++)
                 {
                     int copyOfI = i;
-                    Thread thread = new Thread(() => Mult(matrixA, matrixB, matrixC, copyOfI));
+                    Thread thread = new Thread(() => Mult(matrixA, matrixB, matrixResult, copyOfI));
                     threads.Add(thread);
                     thread.Start();
                 }
@@ -97,11 +97,11 @@ namespace Cesar_consol
             // Performs a series of tests from "startSize" to "endSize" 
             for (int size = startSize; size < endSize; size += step)
             {
-                Matrix matrixC = new Matrix(size);
+                Matrix matrixResult = new Matrix(size);
                 stopWatch.Start();                
 
                 // Множення матриць
-                MultAsync(matrixA, matrixB, matrixC);
+                MultAsync(matrixA, matrixB, matrixResult);
 
                 stopWatch.Stop();
                 Results.Add(new SimpleResult(size, stopWatch.Elapsed.TotalMilliseconds.ToString()));
@@ -148,20 +148,20 @@ namespace Cesar_consol
             // Performs a series of tests from "startSize" to "endSize" 
             for (int size = startSize; size < endSize; size += step)
             {
-                Matrix matrixC = new Matrix(size);
+                Matrix matrixResult = new Matrix(size);
                 stopWatch.Start();
 
-                // Fils matrixC
+                // Fils matrixResult
                 for (int i = 0; i < size; i++)
                 {
                     for (int j = 0; j < size; j++)
                     {
-                        matrixC[i, j] = matrix[i, j];
+                        matrixResult[i, j] = matrix[i, j];
                     }
                 }
 
                 // Determinant
-                float a = ParallelDet(new Matrix(matrixC));
+                float a = ParallelDet(new Matrix(matrixResult));
                 stopWatch.Stop();
                 Results.Add(new SimpleResult(size, stopWatch.Elapsed.TotalMilliseconds.ToString()));
                 stopWatch.Restart();

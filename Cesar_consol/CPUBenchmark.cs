@@ -18,10 +18,10 @@ namespace Cesar_consol
         /// <param name="matrix"></param>
         /// <param name="startSize"></param>
         /// <param name="endSize"></param>
-        public List<SimpleResult> RunSumTest(float[,] matrix, int startSize, int step)
+        public List<SimpleResult> RunSumTest(Matrix matrix, int startSize, int step)
         {
             List<SimpleResult> Results = new List<SimpleResult>();            
-            int endSize = matrix.GetLength(0) / step;
+            int endSize = matrix.Size / step;
             stopWatch.Restart();
 
             // Performs a series of tests from "startSize" to "endSize"
@@ -57,16 +57,16 @@ namespace Cesar_consol
         /// <param name="matrixB"></param>
         /// <param name="startSize"></param>
         /// <param name="endSize"></param>
-        public List<SimpleResult> RunMultTest(float[,] matrixA, float[,] matrixB, int startSize, int step)
+        public List<SimpleResult> RunMultTest(Matrix matrixA, Matrix matrixB, int startSize, int step)
         {
             List<SimpleResult> Results = new List<SimpleResult>();
-            int endSize = matrixA.GetLength(0) / step;
+            int endSize = matrixA.Size / step;
             stopWatch.Restart();
 
             // Performs a series of tests from "startSize" to "endSize"
             for (int size = startSize; size <= endSize; size += step)
             {
-                Matrix matrixC = new Matrix(size);
+                Matrix matrixResult = new Matrix(size);
 
                 // Matrix multiplication
                 for (int i = 0; i < size; i++)
@@ -75,7 +75,7 @@ namespace Cesar_consol
                     {
                         for (int k = 0; k < size; k++)
                         {
-                            matrixC[i, j] += matrixA[i, k] * matrixB[k, j];
+                            matrixResult[i, j] += matrixA[i, k] * matrixB[k, j];
                         }
                     }
                 }
@@ -116,19 +116,19 @@ namespace Cesar_consol
             // Performs a series of tests from "startSize" to "endSize" 
             for (int size = startSize; size <= endSize; size += step)
             {
-                Matrix matrixC = new Matrix(size);
+                Matrix matrixResult = new Matrix(size);
 
-                // Fils matrixC
+                // Fils matrixResult
                 for (int i = 0;i < size; i++)
                 {
                     for(int j = 0;j < size; j++)
                     {
-                        matrixC[i, j] = matrix[i, j];
+                        matrixResult[i, j] = matrix[i, j];
                     }
                 }
 
                 // Determinant
-                float a = det(new Matrix(matrixC));
+                float a = det(new Matrix(matrixResult));
 
                 stopWatch.Stop();
                 Results.Add(new SimpleResult(size, stopWatch.Elapsed.TotalMilliseconds.ToString()));
