@@ -38,7 +38,7 @@ namespace Cesar_consol
 
             return Results;
         }
-        public float[] MatrixAddGPU(float[,] matrixA)
+        private float[] MatrixAddGPU(float[,] matrixA)
         {
             void MatrixMultiplyKernel(Index2D index, ArrayView2D<float, Stride2D.DenseX> matrixA, ArrayView1D<float, Stride1D.Dense> output)
             {
@@ -137,5 +137,86 @@ namespace Cesar_consol
             mC.Dispose();
             return a;
         }
+
+        // Det Test
+        public List<SimpleResult> RunDetTestGPU(Matrix matrix, int startSize, int step)
+        {
+            List<SimpleResult> Results = new List<SimpleResult>();
+            int endSize = matrix.Size / step;
+            stopWatch.Restart();
+
+            // Performs a series of tests from "startSize" to "endSize" 
+            for (int size = startSize; size < endSize; size += step)
+            {
+                float matrixResult;
+                stopWatch.Start();
+
+                // Множення матриць
+                matrixResult = MatrixDetGPU(matrix.ToFloat());
+
+                stopWatch.Stop();
+                Results.Add(new SimpleResult(size, stopWatch.Elapsed.TotalMilliseconds.ToString()));
+                stopWatch.Restart();
+            }
+
+            return Results;
+        }
+        private float MatrixDetGPU(float[,] matrixA)
+        {
+            void DetKernel(Index1D index, ArrayView2D<float, Stride2D.DenseX> matrixA)
+            {
+                for (int q = 0; q < 2; q++)
+                {
+                    int i = index;
+                    for (var j = i + 1; j < matrixA.IntExtent.Y; j++)
+                    {
+                        var coef = matrixA[j, i] / matrixA[i, i];
+
+                        for (var k = 0; k < matrixA.IntExtent.Y; k++)
+                        {
+                            matrixA[j, k] = matrixA[j, k] - (matrixA[i, k] * coef);
+                        }
+                    }
+                }
+            }
+
+            Context ctx = Context.CreateDefault();
+            Accelerator AxeleratorgpuDevice = ctx.GetPreferredDevice(preferCPU: false)
+                                      .CreateAccelerator(ctx);
+
+            // Karnal for DetKernel
+            Action<Index1D, ArrayView2D<float, Stride2D.DenseX>>
+                kernel = AxeleratorgpuDevice.LoadAutoGroupedStreamKernel<Index1D, ArrayView2D<float, Stride2D.DenseX>>(DetKernel);
+
+
+            int Rows = matrixA.GetLength(0);
+            int Cols = matrixA.GetLength(0);
+            float[] outarr = new float[Rows];
+            outarr[1] = 1;
+            MemoryBuffer2D<float, Stride2D.DenseX> mA = AxeleratorgpuDevice.Allocate2DDenseX<float>(new Index2D(Rows, Cols));
+            MemoryBuffer1D<float, Stride1D.Dense> mB = AxeleratorgpuDevice.Allocate1D<float>(Rows);
+
+
+            mA.CopyFromCPU(matrixA);
+            mB.CopyFromCPU(outarr);
+            kernel(new Index1D(Cols), mA.View);
+            float[,] a = new float[Rows, Cols];
+
+            mA.CopyToCPU<float>(a);
+
+            float det = 1;
+            for (int i = 0; i < Cols; i++)
+            {
+                det *= a[i, i];
+            }
+
+            // Dispose
+            ctx.Dispose();
+            AxeleratorgpuDevice.Dispose();
+            mA.Dispose();
+            mB.Dispose();
+            return det;
+        }
+
     }
 }

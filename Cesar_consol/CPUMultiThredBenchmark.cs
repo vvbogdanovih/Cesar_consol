@@ -107,39 +107,29 @@ namespace Cesar_consol
                 Results.Add(new SimpleResult(size, stopWatch.Elapsed.TotalMilliseconds.ToString()));
                 stopWatch.Restart();
             }
-
+            
             return Results;
         }
-
+        
         public List<SimpleResult> RunSingularityTestAsync(Matrix matrix, int startSize, int step)
         {
-            static float ParallelDet(Matrix a)
+            static float ParallelDet(Matrix matrix)
             {
-                if (a.Size == 2)
-                    return Matrix.Det2x2(a);
-
-                float res = 0;
-
-                // Запускаємо обчислення для кожного стовпця паралельно
-                Task<float>[] tasks = new Task<float>[a.Size];
-                for (int i = 0; i < a.Size; i++)
+                float det = 1;
+                for (int i = 0; i < matrix.Size; i++)
                 {
-                    int columnIndex = i; // Захоплюємо локальну копію індексу для коректності
-                    tasks[i] = Task.Run(() =>
+                    for (int j = i + 1; j < matrix.Size; j++)
                     {
-                        float minorDet = ParallelDet(Matrix.GetMinor(a, columnIndex));
-                        return a[0, columnIndex] * ((columnIndex % 2 == 0) ? -minorDet : minorDet);
-                    });
-                }
+                        float coef = matrix[j, i] / matrix[i, i];
 
-                // Очікуємо завершення всіх потоків та додаємо їх результати до res
-                Task.WaitAll(tasks);
-                foreach (var task in tasks)
-                {
-                    res += task.Result;
+                        for (int k = 0; k < matrix.Size; k++)
+                        {
+                            matrix[j, k] = matrix[j, k] - (matrix[i, k] * coef);
+                        }
+                    }
+                    det *= matrix[i, i];
                 }
-
-                return (float)Math.Round(res, 4);
+                return det;
             }
             List<SimpleResult> Results = new List<SimpleResult>();
             int endSize = matrix.Size / step;

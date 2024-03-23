@@ -3,6 +3,7 @@ using ILGPU;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
+using ILGPU.Runtime.OpenCL;
 
 namespace Cesar_consol
 {
@@ -41,54 +42,77 @@ namespace Cesar_consol
         public static void Main()
         {
             var matrixA = new float[3, 3] {
-            {1,2,3 },
-            {2,3,4 },
-            {3,4,5 } 
+            {1,2,33 },
+            {6,3,4 },
+            {3,4,5 }
             };
             var matrixB = new float[3, 3] {
             {2,3,4 },{2,3,4 },{3,4,5 } };
 
             //var s = Stopwatch.StartNew();
-            PrintMatrix(MatrixAddGPU(matrixA));
+            //PrintMatrix(MatrixAddGPU(matrixA));
 
+            float[,] m = new float[3, 3] {
+            {1,2,33 },
+            {6,3,4 },
+            {3,4,5 }
+            };
 
-        }
+            Matrix test = new Matrix(1000);
+            test.RandFil();
 
-        public static float[] MatrixAddGPU(float[,] matrixA)
-        {
-            void MatrixMultiplyKernel(Index2D index, ArrayView2D<float, Stride2D.DenseX> matrixA, ArrayView1D<float, Stride1D.Dense> output)
-            {
-                for (var i = 0; i < matrixA.IntExtent.Y; i++)
-                    output[index.X] += matrixA[new Index2D(index.X, i)];
-            }
-
-            Context ctx = Context.CreateDefault();
-            Accelerator AxeleratorgpuDevice = ctx.GetPreferredDevice(preferCPU: false)
-                                      .CreateAccelerator(ctx);
-
-            // Karnal for MatrixMultiplyKernel
-            Action<Index2D, ArrayView2D<float, Stride2D.DenseX>, ArrayView1D<float, Stride1D.Dense>>
-                kernel = AxeleratorgpuDevice.LoadAutoGroupedStreamKernel<Index2D, ArrayView2D<float, Stride2D.DenseX>, ArrayView1D<float, Stride1D.Dense>> (MatrixMultiplyKernel);
-
-
-            int Rows = matrixA.GetLength(0);
-            int Cols = matrixA.GetLength(0);
-            MemoryBuffer2D<float, Stride2D.DenseX> mA = AxeleratorgpuDevice.Allocate2DDenseX<float>(new Index2D(Rows, Cols));
-            MemoryBuffer1D<float, Stride1D.Dense> mB = AxeleratorgpuDevice.Allocate1D<float>(Rows);
+            /*
+            Console.WriteLine(det(test.ToFloat()));
+            Console.WriteLine(MatrixAddGPU(test.ToFloat()));
+            */
+            Console.WriteLine(ParalelDet(test.ToFloat()));
+            Console.WriteLine(det(test.ToFloat()));
+            
             
 
-            mA.CopyFromCPU(matrixA);
-            kernel(mA.Extent.ToIntIndex(), mA.View, mB.View);
-            float[] a = new float[Rows];
-            mB.CopyToCPU<float>(a);
-            // Dispose
-            ctx.Dispose();
-            AxeleratorgpuDevice.Dispose();
-            mA.Dispose();
-            mB.Dispose();
-            return a; 
+            
+            //Console.WriteLine("Determinant of m computed via decomposition = " + det.ToString("F1"));
         }
 
+        public static float det(float[,] matrix)
+        {
+            float det = 1;
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                for(int j = i+1;  j < matrix.GetLength(1); j++)
+                {                    
+                    float coef = matrix[j,i] / matrix[i,i];
+
+                    for(int k = 0; k < matrix.GetLength(0); k++)
+                    {
+                        matrix[j, k] = matrix[j, k] - (matrix[i, k] * coef);
+                    }
+                }
+                det *= matrix[i,i];
+            }
+            return det;
+            
+        }
+
+        public static float ParalelDet(float[,] matrix)
+        {
+            float det = 1;
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                for (int j = i + 1; j < matrix.GetLength(1); j++)
+                {
+                    float coef = matrix[j, i] / matrix[i, i];
+                    Parallel.For(0, matrix.GetLength(1), k =>
+                    {
+                        matrix[j, k] = matrix[j, k] - (matrix[i, k] * coef);
+                    });
+                }
+                det *= matrix[i, i];
+            }
+            return det;
+        }
+
+        
 
     }
 }

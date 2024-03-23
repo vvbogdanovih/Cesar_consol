@@ -89,25 +89,23 @@ namespace Cesar_consol
 
         public List<SimpleResult> RunSingularityTest(Matrix matrix, int startSize, int step)
         {
-            static float det(Matrix a)
+            static float det(Matrix matrix)
             {
-                if (a.Size == 2) return Matrix.Det2x2(a);
-                float res = 0;
-
-                for (int i = 0; i < a.Size; i++)
+                float det = 1;
+                for (int i = 0; i < matrix.Size; i++)
                 {
-                    if ((i % 2) == 0)
+                    for (int j = i + 1; j < matrix.Size; j++)
                     {
-                        res += a[0, i] * (-det(Matrix.GetMinor(a, i)));
-                    }
-                    else
-                    {
-                        res += a[0, i] * det(Matrix.GetMinor(a, i));
-                    }
+                        float coef = matrix[j, i] / matrix[i, i];
 
+                        for (int k = 0; k < matrix.Size; k++)
+                        {
+                            matrix[j, k] = matrix[j, k] - (matrix[i, k] * coef);
+                        }
+                    }
+                    det *= matrix[i, i];
                 }
-
-                return res;
+                return det;
             }
             List<SimpleResult> Results = new List<SimpleResult>();
             int endSize = matrix.Size / step;
