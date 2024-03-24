@@ -7,16 +7,13 @@ using System.Threading.Tasks;
 
 namespace Cesar_consol
 {
-    internal class CPUMultiThredBenchmark
+    public class CPUMultiThredBenchmark
     {
         private Stopwatch stopWatch = new Stopwatch();
 
-        public CPUMultiThredBenchmark()
-        {
-            
-        }
+        public CPUMultiThredBenchmark() {}
 
-        public List<SimpleResult> RunSumTestTestAsync(Matrix matrix, int startSize, int step)
+        public List<SimpleResult> RunSumTestTestAsync(Matrix matrix, int startSize, int endSize, int step)
         {
             void SumRow(Matrix matrix, int i, float[] arrForSum)
             {
@@ -27,23 +24,31 @@ namespace Cesar_consol
                 }
                 arrForSum[i] = sum;
             }
-            List<SimpleResult> Results = new List<SimpleResult>();            
-            int endSize = matrix.Size / step;
+            List<SimpleResult> Results = new List<SimpleResult>();
             stopWatch.Restart();
 
             // Performs a series of tests from "startSize" to "endSize"
-            for (int size = startSize; size < endSize; size += step)
+            for (int size = startSize; size <= endSize; size += step)
             {                
-                stopWatch.Start();
+                Matrix tempMatrix = new Matrix(size);
+
+                // Fils tempMatrix
+                for (int i = 0;i < size; i++)
+                {
+                    for(int j = 0;j < size; j++)
+                    {
+                        tempMatrix[i, j] = matrix[i, j];
+                    }
+                }
 
                 // Adding matrices
-                
-                float[] sumArray = new float[matrix.Size];
+                stopWatch.Start();
+                float[] sumArray = new float[size];
                 List<Thread> threads = new List<Thread>();
-                for (int i = 0; i < matrix.Size; i++)
+                for (int i = 0; i < size; i++)
                 {
                     int copyOfI = i;
-                    Thread thread = new Thread(() => SumRow(matrix, copyOfI, sumArray));
+                    Thread thread = new Thread(() => SumRow(tempMatrix, copyOfI, sumArray));
                     threads.Add(thread);
                     thread.Start();
                 }
@@ -60,7 +65,7 @@ namespace Cesar_consol
             return Results;
         }
 
-        public List<SimpleResult> RunMultTestAsync(Matrix matrixA, Matrix matrixB, int startSize, int step)
+        public List<SimpleResult> RunMultTestAsync(Matrix matrixA, Matrix matrixB, int startSize, int endSize, int step)
         {
             static void MultAsync(Matrix matrixA, Matrix matrixB, Matrix matrixResult)
             {
@@ -91,13 +96,23 @@ namespace Cesar_consol
             }
 
             List<SimpleResult> Results = new List<SimpleResult>();
-            int endSize = matrixA.Size / step;
             stopWatch.Restart();
 
             // Performs a series of tests from "startSize" to "endSize" 
-            for (int size = startSize; size < endSize; size += step)
+            for (int size = startSize; size <= endSize; size += step)
             {
                 Matrix matrixResult = new Matrix(size);
+                Matrix tempMatrixA = new Matrix(size);
+                Matrix tempMatrixB = new Matrix(size);
+
+                for (int i = 0; i < size; i++)
+                {
+                    for (int j = 0; j < size; j++)
+                    {
+                        tempMatrixA[i, j] = matrixA[i, j];
+                        tempMatrixB[i, j] = matrixB[i, j];
+                    }
+                }
                 stopWatch.Start();                
 
                 // Множення матриць
@@ -111,7 +126,7 @@ namespace Cesar_consol
             return Results;
         }
         
-        public List<SimpleResult> RunSingularityTestAsync(Matrix matrix, int startSize, int step)
+        public List<SimpleResult> RunSingularityTestAsync(Matrix matrix, int startSize, int endSize, int step)
         {
             static float ParallelDet(Matrix matrix)
             {
@@ -132,26 +147,25 @@ namespace Cesar_consol
                 return det;
             }
             List<SimpleResult> Results = new List<SimpleResult>();
-            int endSize = matrix.Size / step;
             stopWatch.Restart();
 
             // Performs a series of tests from "startSize" to "endSize" 
             for (int size = startSize; size < endSize; size += step)
             {
-                Matrix matrixResult = new Matrix(size);
-                stopWatch.Start();
+                Matrix tempMatrix = new Matrix(size);                
 
                 // Fils matrixResult
                 for (int i = 0; i < size; i++)
                 {
                     for (int j = 0; j < size; j++)
                     {
-                        matrixResult[i, j] = matrix[i, j];
+                        tempMatrix[i, j] = matrix[i, j];
                     }
                 }
 
+                stopWatch.Start();
                 // Determinant
-                float a = ParallelDet(new Matrix(matrixResult));
+                float a = ParallelDet(new Matrix(tempMatrix));
                 stopWatch.Stop();
                 Results.Add(new SimpleResult(size, stopWatch.Elapsed.TotalMilliseconds.ToString()));
                 stopWatch.Restart();

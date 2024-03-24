@@ -28,6 +28,19 @@ namespace Cesar_consol
                 Console.WriteLine();
             }
         }
+        
+        public static void PrintResult (Result[] result)
+        {
+            for(int i = 0;i < result.Length;i++)
+            {
+                Console.WriteLine(result[i].Type);
+                foreach (SimpleResult resultItem in result[i].Results)
+                {
+                    Console.WriteLine(resultItem.ToString());
+                }
+            }
+            
+        }
         public static void PrintMatrix(Matrix matrix)
         {
             for (int i = 0; i < matrix.Size; i++)
@@ -41,77 +54,12 @@ namespace Cesar_consol
         }
         public static void Main()
         {
-            var matrixA = new float[3, 3] {
-            {1,2,33 },
-            {6,3,4 },
-            {3,4,5 }
-            };
-            var matrixB = new float[3, 3] {
-            {2,3,4 },{2,3,4 },{3,4,5 } };
-
-            //var s = Stopwatch.StartNew();
-            //PrintMatrix(MatrixAddGPU(matrixA));
-
-            float[,] m = new float[3, 3] {
-            {1,2,33 },
-            {6,3,4 },
-            {3,4,5 }
-            };
-
-            Matrix test = new Matrix(1000);
-            test.RandFil();
-
-            /*
-            Console.WriteLine(det(test.ToFloat()));
-            Console.WriteLine(MatrixAddGPU(test.ToFloat()));
-            */
-            Console.WriteLine(ParalelDet(test.ToFloat()));
-            Console.WriteLine(det(test.ToFloat()));
-            
-            
-
-            
-            //Console.WriteLine("Determinant of m computed via decomposition = " + det.ToString("F1"));
+           CesarBenchmark cesarBenchmark = new CesarBenchmark();
+            Matrix matrix = new Matrix(300);
+            matrix.RandFil();
+            var a = cesarBenchmark.RunSingularityBeBenchmark(matrix, 20, 300, 20);
+            PrintResult(a);
         }
-
-        public static float det(float[,] matrix)
-        {
-            float det = 1;
-            for (int i = 0; i < matrix.GetLength(0); i++)
-            {
-                for(int j = i+1;  j < matrix.GetLength(1); j++)
-                {                    
-                    float coef = matrix[j,i] / matrix[i,i];
-
-                    for(int k = 0; k < matrix.GetLength(0); k++)
-                    {
-                        matrix[j, k] = matrix[j, k] - (matrix[i, k] * coef);
-                    }
-                }
-                det *= matrix[i,i];
-            }
-            return det;
-            
-        }
-
-        public static float ParalelDet(float[,] matrix)
-        {
-            float det = 1;
-            for (int i = 0; i < matrix.GetLength(0); i++)
-            {
-                for (int j = i + 1; j < matrix.GetLength(1); j++)
-                {
-                    float coef = matrix[j, i] / matrix[i, i];
-                    Parallel.For(0, matrix.GetLength(1), k =>
-                    {
-                        matrix[j, k] = matrix[j, k] - (matrix[i, k] * coef);
-                    });
-                }
-                det *= matrix[i, i];
-            }
-            return det;
-        }
-
         
 
     }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Cesar_consol
 {
-    internal class SimpleResult
+    public class SimpleResult
     {
         public string ElapsedTime { get; private set; }
         public int Size {  get; private set; }

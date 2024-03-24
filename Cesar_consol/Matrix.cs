@@ -3,7 +3,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Cesar_consol
 {
-    internal class Matrix
+    public class Matrix
     {
         public int Size { get; private set; }
         public float[,] matrix { get; private set; }

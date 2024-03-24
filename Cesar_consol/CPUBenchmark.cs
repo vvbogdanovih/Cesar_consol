@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Cesar_consol
 {
-    internal class CPUBenchmark
+    public class CPUBenchmark
     {
         private Stopwatch stopWatch = new Stopwatch();
         public CPUBenchmark()
@@ -18,10 +18,9 @@ namespace Cesar_consol
         /// <param name="matrix"></param>
         /// <param name="startSize"></param>
         /// <param name="endSize"></param>
-        public List<SimpleResult> RunSumTest(Matrix matrix, int startSize, int step)
+        public List<SimpleResult> RunSumTest(Matrix matrix, int startSize, int endSize, int step)
         {
-            List<SimpleResult> Results = new List<SimpleResult>();            
-            int endSize = matrix.Size / step;
+            List<SimpleResult> Results = new List<SimpleResult>();
             stopWatch.Restart();
 
             // Performs a series of tests from "startSize" to "endSize"
@@ -57,10 +56,9 @@ namespace Cesar_consol
         /// <param name="matrixB"></param>
         /// <param name="startSize"></param>
         /// <param name="endSize"></param>
-        public List<SimpleResult> RunMultTest(Matrix matrixA, Matrix matrixB, int startSize, int step)
+        public List<SimpleResult> RunMultTest(Matrix matrixA, Matrix matrixB, int startSize, int endSize, int step)
         {
             List<SimpleResult> Results = new List<SimpleResult>();
-            int endSize = matrixA.Size / step;
             stopWatch.Restart();
 
             // Performs a series of tests from "startSize" to "endSize"
@@ -87,7 +85,7 @@ namespace Cesar_consol
             return Results;
         }
 
-        public List<SimpleResult> RunSingularityTest(Matrix matrix, int startSize, int step)
+        public List<SimpleResult> RunSingularityTest(Matrix matrix, int startSize, int endSize, int step)
         {
             static float det(Matrix matrix)
             {
@@ -108,25 +106,24 @@ namespace Cesar_consol
                 return det;
             }
             List<SimpleResult> Results = new List<SimpleResult>();
-            int endSize = matrix.Size / step;
             stopWatch.Restart();
 
             // Performs a series of tests from "startSize" to "endSize" 
             for (int size = startSize; size <= endSize; size += step)
             {
-                Matrix matrixResult = new Matrix(size);
+                Matrix tempMatrix = new Matrix(size);
 
                 // Fils matrixResult
                 for (int i = 0;i < size; i++)
                 {
                     for(int j = 0;j < size; j++)
                     {
-                        matrixResult[i, j] = matrix[i, j];
+                        tempMatrix[i, j] = matrix[i, j];
                     }
                 }
 
                 // Determinant
-                float a = det(new Matrix(matrixResult));
+                float a = det(new Matrix(tempMatrix));
 
                 stopWatch.Stop();
                 Results.Add(new SimpleResult(size, stopWatch.Elapsed.TotalMilliseconds.ToString()));

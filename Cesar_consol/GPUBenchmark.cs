@@ -9,27 +9,37 @@ using System.Threading.Tasks;
 
 namespace Cesar_consol
 {
-    internal class GPUBenchmark
+    public class GPUBenchmark
     {
         private Stopwatch stopWatch = new Stopwatch();
 
         public GPUBenchmark() { }
 
         // Sum Test
-        public List<SimpleResult> RunSumTestGPU(Matrix matrix, int startSize, int step)
+        public List<SimpleResult> RunSumTestGPU(Matrix matrix, int startSize, int endSize, int step)
         {
             List<SimpleResult> Results = new List<SimpleResult>();
-            int endSize = matrix.Size / step;
             stopWatch.Restart();
 
             // Performs a series of tests from "startSize" to "endSize" 
-            for (int size = startSize; size < endSize; size += step)
+            for (int size = startSize; size <= endSize; size += step)
             {
+                Matrix tempMatrix = new Matrix(size);
+
+                // Fils matrixResult
+                for (int i = 0; i < size; i++)
+                {
+                    for (int j = 0; j < size; j++)
+                    {
+                        tempMatrix[i, j] = matrix[i, j];
+                    }
+                }
+
                 float[] matrixResult;
                 stopWatch.Start();
 
                 // Множення матриць
-                matrixResult = MatrixAddGPU(matrix.ToFloat());
+                matrixResult = MatrixAddGPU(tempMatrix.ToFloat());
 
                 stopWatch.Stop();
                 Results.Add(new SimpleResult(size, stopWatch.Elapsed.TotalMilliseconds.ToString()));
@@ -77,20 +87,31 @@ namespace Cesar_consol
         }
 
         // Multiplay Test
-        public List<SimpleResult> RunMultTestGPU(Matrix matrixA, Matrix matrixB, int startSize, int step)
+        public List<SimpleResult> RunMultTestGPU(Matrix matrixA, Matrix matrixB, int startSize, int endSize, int step)
         {
             List<SimpleResult> Results = new List<SimpleResult>();
-            int endSize = matrixA.Size / step;
             stopWatch.Restart();
 
             // Performs a series of tests from "startSize" to "endSize" 
-            for (int size = startSize; size < endSize; size += step)
+            for (int size = startSize; size <= endSize; size += step)
             {
-                Matrix matrixResult; 
+                Matrix matrixResult;
+                Matrix tempMatrixA = new Matrix(size);
+                Matrix tempMatrixB = new Matrix(size);
+
+                // Fils matrixResult
+                for (int i = 0; i < size; i++)
+                {
+                    for (int j = 0; j < size; j++)
+                    {
+                        tempMatrixA[i, j] = matrixA[i, j];
+                        tempMatrixB[i, j] = matrixB[i, j];
+                    }
+                }
                 stopWatch.Start();
 
                 // Множення матриць
-                matrixResult = new Matrix(MatrixMultiplayGPU(matrixA.ToFloat(), matrixB.ToFloat()));
+                matrixResult = new Matrix(MatrixMultiplayGPU(tempMatrixA.ToFloat(), tempMatrixB.ToFloat()));
                 
                 stopWatch.Stop();
                 Results.Add(new SimpleResult(size, stopWatch.Elapsed.TotalMilliseconds.ToString()));
@@ -139,20 +160,29 @@ namespace Cesar_consol
         }
 
         // Det Test
-        public List<SimpleResult> RunDetTestGPU(Matrix matrix, int startSize, int step)
+        public List<SimpleResult> RunSingularityTestGPU(Matrix matrix, int startSize, int endSize, int step)
         {
             List<SimpleResult> Results = new List<SimpleResult>();
-            int endSize = matrix.Size / step;
             stopWatch.Restart();
 
             // Performs a series of tests from "startSize" to "endSize" 
-            for (int size = startSize; size < endSize; size += step)
+            for (int size = startSize; size <= endSize; size += step)
             {
                 float matrixResult;
+                Matrix tempMatrix = new Matrix(size);
+
+                // Fils matrixResult
+                for (int i = 0; i < size; i++)
+                {
+                    for (int j = 0; j < size; j++)
+                    {
+                        tempMatrix[i, j] = matrix[i, j];
+                    }
+                }
                 stopWatch.Start();
 
-                // Множення матриць
-                matrixResult = MatrixDetGPU(matrix.ToFloat());
+                // Matrix Det
+                matrixResult = MatrixDetGPU(tempMatrix.ToFloat());
 
                 stopWatch.Stop();
                 Results.Add(new SimpleResult(size, stopWatch.Elapsed.TotalMilliseconds.ToString()));
