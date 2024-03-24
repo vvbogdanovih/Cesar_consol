@@ -12,7 +12,7 @@ namespace Cesar_consol
         public CesarBenchmark() { }
         //public CesarBenchmark(TMatrix initialMatrix) => inputMatrix = initialMatrix;
 
-        public Result[] RunSumBeBenchmark(Matrix matrix, int startSize, int endSize, int step)
+        public Result[] RunSumBenchmark(Matrix matrix, int startSize, int endSize, int step)
         {
             CPUBenchmark cPUBenchmark = new CPUBenchmark();
             CPUMultiThredBenchmark cPUMultiThredBenchmark = new CPUMultiThredBenchmark();

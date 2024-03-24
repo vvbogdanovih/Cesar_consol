@@ -55,9 +55,9 @@ namespace Cesar_consol
         public static void Main()
         {
            CesarBenchmark cesarBenchmark = new CesarBenchmark();
-            Matrix matrix = new Matrix(300);
+            Matrix matrix = new Matrix(1000);
             matrix.RandFil();
-            var a = cesarBenchmark.RunMultBenchmark(matrix, matrix, 20, 300, 20);
+            var a = cesarBenchmark.RunSumBenchmark(matrix, 100, 1000, 100);
             PrintResult(a);
         }
         
