@@ -101,7 +101,7 @@ namespace Cesar_consol
             // Performs a series of tests from "startSize" to "endSize" 
             for (int size = startSize; size <= endSize; size += step)
             {
-                Matrix matrixResult = new Matrix(size);
+                Matrix matrixResult = new Matrix(matrixA.Size);
                 Matrix tempMatrixA = new Matrix(size);
                 Matrix tempMatrixB = new Matrix(size);
 

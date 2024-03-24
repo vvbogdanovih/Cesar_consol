@@ -57,7 +57,7 @@ namespace Cesar_consol
            CesarBenchmark cesarBenchmark = new CesarBenchmark();
             Matrix matrix = new Matrix(300);
             matrix.RandFil();
-            var a = cesarBenchmark.RunSingularityBeBenchmark(matrix, 20, 300, 20);
+            var a = cesarBenchmark.RunMultBenchmark(matrix, matrix, 20, 300, 20);
             PrintResult(a);
         }
         
